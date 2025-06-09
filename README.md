@@ -11,10 +11,10 @@ You'll learn how to:
 
 ## Prerequisites
 
-- Clone the [KICS](https://github.com/Checkmarx/kics) repository locally
-- Install Go (>= 1.23 recommended)
-- (Optional) Familiarity with REGO language and OPA concepts
-- (Optional) Access to [REGO Playground](https://play.openpolicyagent.org/)
+- Clone the [KICS](https://github.com/Checkmarx/kics) repository locally;
+- Access to [REGO Playground](https://play.openpolicyagent.org/)
+- (Optional) Install Go (>= 1.23 recommended) - to run kics locally or use docker engine;
+- (Optional) Familiarity with REGO language and OPA concepts;
 
 ## Running KICS Locally
 

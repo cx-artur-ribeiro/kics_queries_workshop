@@ -28,3 +28,11 @@ go run cmd/console/main.go scan \
   -i "unique-id" \
   -d "payload_output.json" \
   -v
+```
+
+## Useful Links
+
+- REGO Language Documentation - https://www.openpolicyagent.org/docs/policy-language      
+- KICS Official Documentation - https://docs.kics.io/latest/   
+- KICS GITHUB Repo - https://github.com/Checkmarx/kics   
+- OPA REGO Playground - https://play.openpolicyagent.org/

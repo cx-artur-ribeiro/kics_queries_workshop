@@ -9,8 +9,10 @@ CxPolicy[result] {
 	doc := input.document[i]
 	[path, value] = walk(doc)
 	value.type == "Microsoft.Storage/storageAccounts/blobServices/containers"
+
 	[val, val_type] := arm_lib.getDefaultValueFromParametersIfPresent(doc, value.properties.publicAccess)
 	val == publicOptions[o]
+
 	result := {
 		"documentId": input.document[i].id,
 		"resourceType": value.type,
@@ -27,10 +29,13 @@ CxPolicy[result] {
 	doc := input.document[i]
 	[path, value] = walk(doc)
 	value.type == "Microsoft.Storage/storageAccounts/blobServices"
+
 	[childPath, childValue] := walk(value.resources)
 	childValue.type == "containers"
+
 	[val, val_type] := arm_lib.getDefaultValueFromParametersIfPresent(doc, childValue.properties.publicAccess)
 	val == publicOptions[o]
+
 	result := {
 		"documentId": input.document[i].id,
 		"resourceType": value.type,
@@ -47,10 +52,13 @@ CxPolicy[result] {
 	doc := input.document[i]
 	[path, value] = walk(doc)
 	value.type == "Microsoft.Storage/storageAccounts"
+
 	[childPath, childValue] := walk(value.resources)
 	childValue.type == "blobServices/containers"
+
 	[val, val_type] := arm_lib.getDefaultValueFromParametersIfPresent(doc, childValue.properties.publicAccess)
 	val == publicOptions[o]
+
 	result := {
 		"documentId": input.document[i].id,
 		"resourceType": value.type,

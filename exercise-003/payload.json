@@ -1,0 +1,74 @@
+{
+  "document": [
+    {
+      "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+      "contentVersion": "1.0.0.0",
+      "file": "test\\positive.json",
+      "id": "d5b422d2-f879-402b-8381-ae0f9843d4af",
+      "resources": [
+        {
+          "apiVersion": "2019-06-01",
+          "kind": "StorageV2",
+          "location": "[parameters('location')]",
+          "name": "[parameters('storageAccountName')]",
+          "properties": {
+            "accessTier": "Cool",
+            "encryption": {
+              "keySource": "Microsoft.Storage",
+              "services": {
+                "blob": {
+                  "enabled": true,
+                  "keyType": "Account"
+                },
+                "file": {
+                  "enabled": true,
+                  "keyType": "Account"
+                }
+              }
+            },
+            "networkAcls": {
+              "defaultAction": "Deny"
+            },
+            "supportsHttpsTrafficOnly": true
+          },
+          "resources": [
+            {
+              "apiVersion": "2019-06-01",
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+              ],
+              "name": "[concat(parameters('storageAccountName'), '/default')]",
+              "properties": {
+                "deleteRetentionPolicy": {
+                  "enabled": false
+                }
+              },
+              "resources": [
+                {
+                  "apiVersion": "2019-06-01",
+                  "name": "container",
+                  "properties": {
+                    "denyEncryptionScopeOverride": true,
+                    "metadata": {},
+                    "publicAccess": "Blob"
+                  },
+                  "type": "containers"
+                }
+              ],
+              "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+              },
+              "type": "blobServices"
+            }
+          ],
+          "sku": {
+            "name": "Standard_LRS",
+            "tier": "Standard"
+          },
+          "type": "Microsoft.Storage/storageAccounts"
+        }
+      ]
+    }
+  ]
+}

@@ -1,65 +1,102 @@
 package Cx
 
-import data.generic.dockerfile as dockerLib
+import data.generic.common as common_lib
+import data.generic.azureresourcemanager as arm_lib
+
+publicOptions := {"Container", "Blob"}
 
 CxPolicy[result] {
-	resource := input.document[i].command[name][_]
-	resource.Cmd == "run"
+	doc := input.document[i]
+	[path, value] = walk(doc)
 
-	count(resource.Value) == 1
+	value.type == "Microsoft.Storage/storageAccounts/blobServices/containers"
 
-	commands := resource.Value[j]
-	command := dockerLib.getCommands(commands)[_]
-	isAptGet(command)
-
-	not avoidManualInput(command)
+	[val, val_type] := arm_lib.getDefaultValueFromParametersIfPresent(doc, value.properties.publicAccess)
+	val == publicOptions[o]
 
 	result := {
 		"documentId": input.document[i].id,
-		"searchKey": sprintf("FROM={{%s}}.{{%s}}", [name, resource.Original]),
+		"resourceType": value.type,
+		"resourceName": value.name,
+		"searchKey": sprintf("%s.name=%s.properties.publicAccess", [common_lib.concat_path(path), value.name]),
 		"issueType": "IncorrectValue",
-		"keyExpectedValue": sprintf("{{%s}} sould avoid manual input", [resource.Original]),
-		"keyActualValue": sprintf("{{%s}} doesn't avoid manual input", [resource.Original]),
+		"keyExpectedValue": sprintf("resource with type 'Microsoft.Storage/storageAccounts/blobServices/containers' shouldn't have 'publicAccess' %s set to 'Container' or 'Blob'", [val_type]),
+		"keyActualValue": sprintf("resource with type 'Microsoft.Storage/storageAccounts/blobServices/containers' has 'publicAccess' property set to '%s'", [publicOptions[o]]),
+		"searchLine": common_lib.build_search_line(path, ["properties", "publicAccess"]),
 	}
 }
 
 CxPolicy[result] {
-	resource := input.document[i].command[name][_]
-	resource.Cmd == "run"
+	doc := input.document[i]
+	[path, value] = walk(doc)
 
-	count(resource.Value) > 1
+	value.type == "Microsoft.Storage/storageAccounts/blobServices"
 
-	dockerLib.arrayContains(resource.Value, {"apt-get", "install"})
+	[childPath, childValue] := walk(value.resources)
 
-	not avoidManualInputInList(resource.Value)
+	childValue.type == "containers"
+	[val, val_type] := arm_lib.getDefaultValueFromParametersIfPresent(doc, childValue.properties.publicAccess)
+	val == publicOptions[o]
 
 	result := {
 		"documentId": input.document[i].id,
-		"searchKey": sprintf("FROM={{%s}}.{{%s}}", [name, resource.Original]),
+		"resourceType": value.type,
+		"resourceName": value.name,
+		"searchKey": sprintf("%s.name=%s.resources.name=%s.properties.publicAccess", [common_lib.concat_path(path), value.name, childValue.name]),
 		"issueType": "IncorrectValue",
-		"keyExpectedValue": sprintf("{{%s}} should avoid manual input", [resource.Original]),
-		"keyActualValue": sprintf("{{%s}} doesn't avoid manual input", [resource.Original]),
+		"keyExpectedValue": sprintf("resource with type 'containers' shouldn't have 'publicAccess' %s set to 'Container' or 'Blob'",[val_type]),
+		"keyActualValue": sprintf("resource with type 'containers' has 'publicAccess' property set to '%s'", [publicOptions[o]]),
+		"searchLine": common_lib.build_search_line(childPath, ["properties", "publicAccess"]),
 	}
 }
 
-isAptGet(command) {
-	regex.match("apt-get (-(-)?[a-zA-Z]+ *)*install", command)
+CxPolicy[result] {
+	doc := input.document[i]
+	[path, value] = walk(doc)
+
+	value.type == "Microsoft.Storage/storageAccounts"
+
+	[childPath, childValue] := walk(value.resources)
+
+	childValue.type == "blobServices/containers"
+	[val, val_type] := arm_lib.getDefaultValueFromParametersIfPresent(doc, childValue.properties.publicAccess)
+	val == publicOptions[o]
+
+	result := {
+		"documentId": input.document[i].id,
+		"resourceType": value.type,
+		"resourceName": value.name,
+        "searchKey": sprintf("%s.name=%s.resources.name=%s.properties.publicAccess", [common_lib.concat_path(path), value.name, childValue.name]),
+		"issueType": "IncorrectValue",
+		"keyExpectedValue": sprintf("resource with type 'blobServices/containers' shouldn't have 'publicAccess' %s set to 'Container' or 'Blob'", [val_type]),
+		"keyActualValue": sprintf("resource with type 'blobServices/containers' has 'publicAccess' property set to '%s'", [publicOptions[o]]),
+		"searchLine": common_lib.build_search_line(childPath, ["properties", "publicAccess"]),
+	}
 }
 
-avoidManualInputInList(command) {
-	flags := ["-y", "yes", "--assumeyes", "-qy"]
+CxPolicy[result] {
+	doc := input.document[i]
 
-	contains(command[j], flags[x])
-}
+	[path, value] = walk(doc)
+	value.type == "Microsoft.Storage/storageAccounts"
 
-avoidManualInput(command) {
-	regex.match("apt-get (-(-)?[a-zA-Z]+ *)*(-([A-Za-z])*y|-yes|--assumeyes) (-(-)?[a-zA-Z]+ *)*install", command)
-}
+	[childPath, childValue] := walk(value.resources)
+	childValue.type == "blobServices"
 
-avoidManualInput(command) {
-	regex.match("apt-get (-(-)?[a-zA-Z]+ *)*install (-(-)?[a-zA-Z]+ *)*(-([A-Za-z])*y|-yes|--assumeyes)", command)
-}
+	[subchildPath, subchildValue] := walk(childValue.resources)
+	subchildValue.type == "containers"
 
-avoidManualInput(command) {
-	regex.match("apt-get (-(-)?[a-zA-Z]+ *)*install ([A-Za-z0-9\\W]+ *)*(-([A-Za-z])*y|-yes|--assumeyes)", command)
+	[val, val_type] := arm_lib.getDefaultValueFromParametersIfPresent(doc, subchildValue.properties.publicAccess)
+	val == publicOptions[o]
+
+	result := {
+		"documentId": ,
+		"resourceType": ,
+		"resourceName": ,
+        "searchKey": sprintf("%s.name=%s.resources.name=%s.resources.name=%s.properties.publicAccess", [common_lib.concat_path(path), value.name, childValue.name, subchildValue.name]),
+		"issueType": "IncorrectValue",
+		"keyExpectedValue": sprintf("resource with type 'containers' shouldn't have 'publicAccess' %s set to 'Container' or 'Blob'", [val_type]),
+		"keyActualValue": sprintf("resource with type 'containers' has 'publicAccess' property set to '%s'", [publicOptions[o]]),
+		"searchLine": ,
+	}
 }

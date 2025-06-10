@@ -1,43 +1,6 @@
 {
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
-  "parameters": {
-    "existingVNETName": {
-      "type": "string",
-      "metadata": {
-        "description": "Name of the virtual network to use for cloud shell containers."
-      }
-    },
-    "existingStorageSubnetName": {
-      "type": "string",
-      "metadata": {
-        "description": "Name of the subnet to use for storage account."
-      }
-    },
-    "existingContainerSubnetName": {
-      "type": "string",
-      "metadata": {
-        "description": "Name of the subnet to use for cloud shell containers."
-      }
-    },
-    "storageAccountName": {
-      "type": "string",
-      "metadata": {
-        "description": "Name of the storage account in subnet."
-      }
-    },
-    "location": {
-      "type": "string",
-      "defaultValue": "[resourceGroup().location]",
-      "metadata": {
-        "description": "Location for all resources."
-      }
-    }
-  },
-  "variables": {
-    "containerSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('existingVNETName'), parameters('existingContainerSubnetName'))]",
-    "storageSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('existingVNETName'), parameters('existingStorageSubnetName'))]"
-  },
   "resources": [
     {
       "type": "Microsoft.Storage/storageAccounts",

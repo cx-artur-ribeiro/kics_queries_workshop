@@ -1,72 +1,39 @@
 package Cx
 
 import data.generic.common as common_lib
-import data.generic.azureresourcemanager as arm_lib
+import data.generic.terraform as tf_lib
 
-publicOptions := {"Container", "Blob"}
+pl := {"aws_s3_bucket_policy", "aws_s3_bucket"}
 
 CxPolicy[result] {
-	doc := input.document[i]
-	[path, value] = walk(doc)
-	value.type == "Microsoft.Storage/storageAccounts/blobServices/containers"
-
-	[val, val_type] := arm_lib.getDefaultValueFromParametersIfPresent(doc, value.properties.publicAccess)
-	val == publicOptions[o]
-
+	resourceType := pl[r]
+	resource := input.document[i].resource[resourceType][name]
+	tf_lib.allows_action_from_all_principals(resource.policy, "delete")
 	result := {
 		"documentId": input.document[i].id,
-		"resourceType": value.type,
-		"resourceName": value.name,
-		"searchKey": sprintf("%s.name=%s.properties.publicAccess", [common_lib.concat_path(path), value.name]),
+		"resourceType": resourceType,
+		"resourceName": tf_lib.get_specific_resource_name(resource, "aws_s3_bucket", name),
+		"searchKey": sprintf("%s[%s].policy", [resourceType, name]),
 		"issueType": "IncorrectValue",
-		"keyExpectedValue": sprintf("resource with type 'Microsoft.Storage/storageAccounts/blobServices/containers' shouldn't have 'publicAccess' %s set to 'Container' or 'Blob'", [val_type]),
-		"keyActualValue": sprintf("resource with type 'Microsoft.Storage/storageAccounts/blobServices/containers' has 'publicAccess' property set to '%s'", [publicOptions[o]]),
-		"searchLine": common_lib.build_search_line(path, ["properties", "publicAccess"]),
+		"keyExpectedValue": sprintf("%s[%s].policy.Action should not be a 'Delete' action", [resourceType, name]),
+		"keyActualValue": sprintf("%s[%s].policy.Action is a 'Delete' action", [resourceType, name]),
+		"searchLine": common_lib.build_search_line(["resource", resourceType, name, "policy"], []),
 	}
 }
 
 CxPolicy[result] {
-	doc := input.document[i]
-	[path, value] = walk(doc)
-	value.type == "Microsoft.Storage/storageAccounts/blobServices"
-
-	[childPath, childValue] := walk(value.resources)
-	childValue.type == "containers"
-
-	[val, val_type] := arm_lib.getDefaultValueFromParametersIfPresent(doc, childValue.properties.publicAccess)
-	val == publicOptions[o]
-
+	module := input.document[i].module[name]
+	resourceType := pl[r]
+	keyToCheck := common_lib.get_module_equivalent_key("aws", module.source, resourceType, "policy")
+	tf_lib.allows_action_from_all_principals(module[keyToCheck], "delete")
 	result := {
 		"documentId": input.document[i].id,
-		"resourceType": value.type,
-		"resourceName": value.name,
-		"searchKey": sprintf("%s.name=%s.resources.name=%s.properties.publicAccess", [common_lib.concat_path(path), value.name, childValue.name]),
+		"resourceType": "n/a",
+		"resourceName": "n/a",
+		"searchKey": sprintf("module[%s].policy", [name]),
 		"issueType": "IncorrectValue",
-		"keyExpectedValue": sprintf("resource with type 'containers' shouldn't have 'publicAccess' %s set to 'Container' or 'Blob'",[val_type]),
-		"keyActualValue": sprintf("resource with type 'containers' has 'publicAccess' property set to '%s'", [publicOptions[o]]),
-		"searchLine": common_lib.build_search_line(childPath, ["properties", "publicAccess"]),
-	}
-}
-
-CxPolicy[result] {
-	doc := input.document[i]
-	[path, value] = walk(doc)
-	value.type == "Microsoft.Storage/storageAccounts"
-
-	[childPath, childValue] := walk(value.resources)
-	childValue.type == "blobServices/containers"
-
-	[val, val_type] := arm_lib.getDefaultValueFromParametersIfPresent(doc, childValue.properties.publicAccess)
-	val == publicOptions[o]
-
-	result := {
-		"documentId": input.document[i].id,
-		"resourceType": value.type,
-		"resourceName": value.name,
-        "searchKey": sprintf("%s.name=%s.resources.name=%s.properties.publicAccess", [common_lib.concat_path(path), value.name, childValue.name]),
-		"issueType": "IncorrectValue",
-		"keyExpectedValue": sprintf("resource with type 'blobServices/containers' shouldn't have 'publicAccess' %s set to 'Container' or 'Blob'", [val_type]),
-		"keyActualValue": sprintf("resource with type 'blobServices/containers' has 'publicAccess' property set to '%s'", [publicOptions[o]]),
-		"searchLine": common_lib.build_search_line(childPath, ["properties", "publicAccess"]),
+		"keyExpectedValue": "'policy.Statement.Action' should not be a 'Delete' action",
+		"keyActualValue": "'policy.Statement.Action' is a 'Delete' action",
+		"searchLine": common_lib.build_search_line(["module", name, "policy"], []),
 	}
 }

@@ -1,0 +1,51 @@
+{
+	"document": [
+		{
+			"data": {
+				"aws_iam_policy_document": {
+					"positive5": {
+						"statement": {
+							"actions": [
+								"s3:*"
+							],
+							"effect": "Allow",
+							"principals": {
+								"identifiers": [
+									"*"
+								],
+								"type": "AWS"
+							},
+							"resources": [
+								"${var.positive5}",
+								"${var.positive5}/*"
+							]
+						}
+					}
+				}
+			},
+			"file": ".\\assets\\queries\\terraform\\aws\\s3_bucket_allows_delete_action_from_all_principals\\test\\positive5.tf",
+			"id": "ec5ee837-262c-4946-a07a-05171d270fe7",
+			"resource": {
+				"aws_s3_bucket_policy": {
+					"positive5": {
+						"bucket": "${var.positive5}",
+						"depends_on": [
+							"${aws_s3_bucket_public_access_block.positive5}"
+						],
+						"policy": "{\"Statement\":[{\"Actions\":[\"s3:*\"],\"Effect\":\"Allow\",\"Principals\":{\"AWS\":[\"*\"]},\"Resources\":[\"var.positive5\",\"var.positive5/*\"]}]}\n"
+					}
+				},
+				"aws_s3_bucket_public_access_block": {
+					"positive5": {
+						"block_public_acls": true,
+						"block_public_policy": true,
+						"bucket": "${var.positive5[count.index]}",
+						"count": "${length(var.positive5)}",
+						"ignore_public_acls": true,
+						"restrict_public_buckets": true
+					}
+				}
+			}
+		}
+	]
+}

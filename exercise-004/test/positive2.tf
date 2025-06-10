@@ -1,8 +1,8 @@
 # test action "s3:*"
-resource "aws_s3_bucket_public_access_block" "positive5" {
-  count = length(var.positive5)
+resource "aws_s3_bucket_public_access_block" "positive2" {
+  count = length(var.positive2)
 
-  bucket = var.positive5[count.index]
+  bucket = var.positive2[count.index]
 
   block_public_acls       = true
   block_public_policy     = true
@@ -10,7 +10,7 @@ resource "aws_s3_bucket_public_access_block" "positive5" {
   restrict_public_buckets = true
 }
 
-data "aws_iam_policy_document" "positive5" {
+data "aws_iam_policy_document" "positive2" {
   statement {
     principals {
       type        = "AWS"
@@ -24,15 +24,15 @@ data "aws_iam_policy_document" "positive5" {
     ]
 
     resources = [
-      var.positive5,
-      "${var.positive5}/*",
+      var.positive2,
+      "${var.positive2}/*",
     ]
   }
 }
 
 #   "Action": "s3:Delete", "Principal":"*" and "Type":"AWS"
-resource "aws_s3_bucket_policy" "positive5" {
-  depends_on = [aws_s3_bucket_public_access_block.positive5]
-  bucket     = var.positive5
-  policy     = data.aws_iam_policy_document.positive5.json
+resource "aws_s3_bucket_policy" "positive2" {
+  depends_on = [aws_s3_bucket_public_access_block.positive2]
+  bucket     = var.positive2
+  policy     = data.aws_iam_policy_document.positive2.json
 }

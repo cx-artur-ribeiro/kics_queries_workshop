@@ -1,0 +1,25 @@
+{
+  "document": [
+    {
+      "file": "test\\negative.tf",
+      "id": "4a0f19bb-ac70-41f9-8ba4-f00aa904cf18",
+      "resource": {
+        "aws_route_table": {
+          "art_nat_gw_out": {
+            "route": [
+              {
+                "cidr_block": "0.0.0.0/0",
+                "nat_gateway_id": "${aws_nat_gateway.ngw01.id}"
+              },
+              {
+                "cidr_block": "10.0.0.0/24",
+                "vpc_peering_connection_id": "${aws_vpc_peering_connection.avpv.id}"
+              }
+            ],
+            "vpc_id": "${aws_vpc.av_xxx.id}"
+          }
+        }
+      }
+    }
+  ]
+}

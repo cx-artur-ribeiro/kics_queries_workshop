@@ -21,6 +21,7 @@ However, this query currently misses one case: `aws_security_group` resources us
 - Carefully read the provided query.rego;
 - Understand how the is_used function works — note the multiple patterns are already present;
 - Analyze the payloads provided;
+- Copy any required auxiliary functions from kics internal libraries (you can find them in the KICS repo under assets/libraries);
 - Prepare Rego Playground environment and verify that everything is ready to run.
 - Add a new is_used clause to handle aws_elasticache_instance usage;
 - Run the provided tests to verify that:

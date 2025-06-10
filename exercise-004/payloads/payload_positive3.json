@@ -3,7 +3,7 @@
 		{
 			"data": {
 				"aws_iam_policy_document": {
-					"positive6": {
+					"positive3": {
 						"statement": {
 							"actions": [
 								"*"
@@ -16,31 +16,31 @@
 								"type": "AWS"
 							},
 							"resources": [
-								"${var.positive6}",
-								"${var.positive6}/*"
+								"${var.positive3}",
+								"${var.positive3}/*"
 							]
 						}
 					}
 				}
 			},
-			"file": ".\\assets\\queries\\terraform\\aws\\s3_bucket_allows_delete_action_from_all_principals\\test\\positive6.tf",
+			"file": "test\\positive3.tf",
 			"id": "7bd86b6d-bc4e-4550-9c3e-0aef9f41e938",
 			"resource": {
 				"aws_s3_bucket_policy": {
-					"positive6": {
-						"bucket": "${var.positive6}",
+					"positive3": {
+						"bucket": "${var.positive3}",
 						"depends_on": [
-							"${aws_s3_bucket_public_access_block.positive6}"
+							"${aws_s3_bucket_public_access_block.positive3}"
 						],
-						"policy": "{\"Statement\":[{\"Actions\":[\"*\"],\"Effect\":\"Allow\",\"Principals\":{\"AWS\":[\"*\"]},\"Resources\":[\"var.positive6\",\"var.positive6/*\"]}]}\n"
+						"policy": "{\"Statement\":[{\"Actions\":[\"*\"],\"Effect\":\"Allow\",\"Principals\":{\"AWS\":[\"*\"]},\"Resources\":[\"var.positive3\",\"var.positive3/*\"]}]}\n"
 					}
 				},
 				"aws_s3_bucket_public_access_block": {
-					"positive6": {
+					"positive3": {
 						"block_public_acls": true,
 						"block_public_policy": true,
-						"bucket": "${var.positive6[count.index]}",
-						"count": "${length(var.positive6)}",
+						"bucket": "${var.positive3[count.index]}",
+						"count": "${length(var.positive3)}",
 						"ignore_public_acls": true,
 						"restrict_public_buckets": true
 					}

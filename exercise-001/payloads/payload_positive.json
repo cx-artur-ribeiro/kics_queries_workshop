@@ -1,0 +1,34 @@
+{
+  "document": [
+    {
+      "file": ".\\teste\\workshop\\positive.tf",
+      "id": "403196f8-2e2a-4d95-924b-d548b5a71da0",
+      "resource": {
+        "aws_elasticache_replication_group": {
+          "redis": {
+            "automatic_failover_enabled": false,
+            "engine": "redis",
+            "engine_version": "6.x",
+            "parameter_group_name": "default.redis6.x",
+            "replication_group_id": "Example"
+          }
+        },
+        "aws_security_group": {
+          "example": {
+            "description": "Allow Redis traffic",
+            "ingress": {
+              "cidr_blocks": [
+                "${data.aws_vpc.selected.cidr_block}"
+              ],
+              "from_port": 6379,
+              "protocol": "tcp",
+              "to_port": 6379
+            },
+            "name": "example",
+            "vpc_id": "${data.aws_vpc.selected.id}"
+          }
+        }
+      }
+    }
+  ]
+}

@@ -44,7 +44,6 @@ is_used(securityGroupName, doc, resource) {
 	securityGroupUsed := value.vpc_config.security_group_ids[_]
 	contains(securityGroupUsed, sprintf("aws_security_group.%s", [securityGroupName]))
 }
-
 is_used(securityGroupName, doc, resource) {
 	sec_group_used := resource.name
     [path, value] := walk(doc)

@@ -25,21 +25,21 @@ Check line 35 of the positive payloads and the corresponding vulnerability on th
 
 ```
 get_principal(statement) = p {
-	# Check if the statement has a "Principal" field. -> payload_positive4, line 33, "Principal":{"AWS":"*"}
+    # Check if the statement has a "Principal" field. -> payload_positive4, line 33, "Principal":{"AWS":"*"}
     # If it does, return it directly.
 } else = p {
-	# If "Principal" is not found, check if it uses the alternative "Principals" field. -> payload_positive1, line 35, "Principals":{"AWS":["*"]}
+    # If "Principal" is not found, check if it uses the alternative "Principals" field. -> payload_positive1, line 35, "Principals":{"AWS":["*"]}
     # Return that instead.
 }
 
 get_principal_aws(statement) = p {
     # First, use get_principal to fetch the principal block.
     # Then, check if the AWS field exists within it.
-	some principal
-	principal = get_principal()
-	# Then, check if the AWS field exists within it.
+    some principal
+    principal = get_principal()
+    # Then, check if the AWS field exists within it.
 
-	# Return the AWS-specific principal(s)
+    # Return the AWS-specific principal(s)
 
 }
 ```
@@ -70,8 +70,8 @@ action_matches_s3_star(action_value) {
 action_matches_s3_star(action_value) {
     # Check if the action is an array
 
-	# then call the auxiliar function action_is_s3_star_or_star on each value of the array
-	some i
+    # then call the auxiliar function action_is_s3_star_or_star on each value of the array
+    some i
 
 }
 

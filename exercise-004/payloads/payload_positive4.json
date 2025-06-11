@@ -1,0 +1,49 @@
+{
+  "document": [
+    {
+      "data": {
+        "aws_iam_policy_document": {
+          "positive3": {
+            "statement": {
+              "action": "*",
+              "effect": "Allow",
+              "principal": {
+                "identifiers": [
+                  "*"
+                ],
+                "type": "AWS"
+              },
+              "resources": [
+                "${var.positive3}",
+                "${var.positive3}/*"
+              ]
+            }
+          }
+        }
+      },
+      "file": "test\\positive3.tf",
+      "id": "7bd86b6d-bc4e-4550-9c3e-0aef9f41e938",
+      "resource": {
+        "aws_s3_bucket_policy": {
+          "positive3": {
+            "bucket": "${var.positive3}",
+            "depends_on": [
+              "${aws_s3_bucket_public_access_block.positive3}"
+            ],
+            "policy": "{\"Statement\":[{\"Action\":[\"*\"],\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Resources\":[\"var.positive3\",\"var.positive3/*\"]}]}\n"
+          }
+        },
+        "aws_s3_bucket_public_access_block": {
+          "positive3": {
+            "block_public_acls": true,
+            "block_public_policy": true,
+            "bucket": "${var.positive3[count.index]}",
+            "count": "${length(var.positive3)}",
+            "ignore_public_acls": true,
+            "restrict_public_buckets": true
+          }
+        }
+      }
+    }
+  ]
+}
